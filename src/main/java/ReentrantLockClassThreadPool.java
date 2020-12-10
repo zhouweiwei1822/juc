@@ -13,7 +13,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * 消费者就是线程池创建的 线程集合，生产者我们可以认为使我们业务创建的任务对象，其中队列就像中间的消息中心一样
  *
  * @author zhouww
- * 
+ *
  */
 public class ReentrantLockClassThreadPool {
     static  volatile int nmb=0;
@@ -44,15 +44,8 @@ public class ReentrantLockClassThreadPool {
 
             }
         }
-
         System.out.println("System.out.println(nmb1);"+nmb1);
-
-
     }
-
-
-
-
     public static class ThreadRunable implements Runnable{
 
       //  private int nmb=0;
