@@ -12,7 +12,8 @@ import java.util.concurrent.locks.ReentrantLock;
  * 直到任务被全部从队列中取出并且执行完毕 （jdk中的线程池实现功能比较严谨）线程池的实现的基本实现就是这样 实际上也算的上是一种“生产者和消费者的一种模式”
  * 消费者就是线程池创建的 线程集合，生产者我们可以认为使我们业务创建的任务对象，其中队列就像中间的消息中心一样
  *
- *
+ * @author zhouww
+ * 
  */
 public class ReentrantLockClassThreadPool {
     static  volatile int nmb=0;
