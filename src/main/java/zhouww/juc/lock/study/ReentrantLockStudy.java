@@ -1,5 +1,7 @@
 package zhouww.juc.lock.study;
 
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.LockSupport;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -19,17 +21,27 @@ public class  ReentrantLockStudy {
     private  static final ReentrantLock lockFir=new ReentrantLock(true);// 公平锁
 
     public static void main(String[] args) {
-        for(int i=0;i<10;i++){
+        Thread t1=null;
+        for(int i=0;i<1;i++){
             // 公平锁的 案例
            /* Thread t=  new Thread(new ReentranLockFir(lockFir));
                   t.setName("firLock-"+i);
                   t.start();*/
                   // 非公平锁的案例
-            Thread t1=  new Thread(new ReentranLockNoFir(lockNoFir));
+             t1=  new Thread(new ReentranLockNoFir(lockNoFir));
             t1.setName("nofir-"+i);
             t1.start();
 
+
         }
+        try {
+            TimeUnit.SECONDS.sleep(10);
+            System.out.println( t1.isAlive()+""+t1.getId());
+            TimeUnit.SECONDS.sleep(10);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        LockSupport.unpark(t1);
     }
     private  static class ReentranLockNoFir implements Runnable{// 非公平锁的实现
         final  ReentrantLock lockNoFir;
@@ -50,9 +62,11 @@ public class  ReentrantLockStudy {
         @Override
         public void run() {
 
-            lockNoFir.lock();
+           // lockNoFir.lock();
             System.out.println(Thread.currentThread().getName());
-            lockNoFir.unlock();
+            LockSupport.park(this);
+            System.out.println(Thread.interrupted());
+           // lockNoFir.unlock();
         }
     }
    public static class ReentranLockFir implements Runnable{// 公平锁的实现
