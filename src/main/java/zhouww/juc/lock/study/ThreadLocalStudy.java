@@ -1,6 +1,8 @@
 package zhouww.juc.lock.study;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -31,60 +33,19 @@ public class ThreadLocalStudy {
     //private static final ThreadLocal<Integer> y2=new ThreadLocal<Integer>();
 
     public static void main(String[] args) {
- /*       y.set(1);
-        System.out.println("y-"+y.get());
-        y2.set(2);
-        System.out.println("y2-"+y2.get());
-        try {
-            TimeUnit.SECONDS.sleep(1);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        System.out.println("y-"+y.get());
-
-        System.out.println("y2-"+y2.get());*/
-        /*while (true){
-            y.set("--kaisThreadLocal");
-            y.set("--kaisThreadLocal1");
-           *//* try {
-                TimeUnit.MICROSECONDS.sleep(1);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }*//*
-        }
-*/
-
-
-        try {
-            TimeUnit.SECONDS.sleep(30);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
         ThreadLocalRunnable threadLocalRunnable=new ThreadLocalRunnable(y);
-        for(long i=0;;i++){
-            Thread t=new Thread(threadLocalRunnable);
-            t.setName("t-"+i);
+        ThreadLocalRunnable2 threadLocalRunnable2=new ThreadLocalRunnable2(y);
+        ExecutorService service=Executors.newFixedThreadPool(2);
+        for(long i=0;i<10;i++){
+            if(i<=5){
+                service.execute(threadLocalRunnable);
+            }else {
+                service.execute(threadLocalRunnable2);
+            }
 
-            //System.out.println(y.get()+"=========");
-            t.start();
-        }
-       /* ArrayList list=new ArrayList();
-        try {
-            TimeUnit.SECONDS.sleep(10);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    }
+        service.shutdown();
 
-        while(true)
-
-        {
-
-           // list.add(new ThreadLocalStudy());
-            y.set(new ThreadLocalStudy());
-
-        }*/
 
     }
 
@@ -112,6 +73,7 @@ public class ThreadLocalStudy {
         public void run() {
 
                 setThreadLocal();
+
                 getThreadLocal();
 
         }
@@ -122,8 +84,44 @@ public class ThreadLocalStudy {
             System.out.println(Thread.currentThread().getName() + "set-threadlocal-" + threadLocal.get());
         }
         private synchronized void getThreadLocal(){
-            System.out.println(Thread.currentThread().getName() + "get-threadlocal-" + threadLocal.get());
+            threadLocal.remove();
+           // System.out.println(Thread.currentThread().getName() + "get-threadlocal-" + threadLocal.get());
            // System.out.println(Thread.currentThread().getName() + "get-threadlocal2-" + threadLocal2.get());
+        }
+    }
+
+
+    public static class ThreadLocalRunnable2 implements Runnable{
+        private  final  ThreadLocal<ThreadLocalStudy> threadLocal;
+        //private  final  ThreadLocal<Integer> threadLocal2;
+        ThreadLocalRunnable2(ThreadLocal<ThreadLocalStudy> threadLocal/*,ThreadLocal<Integer> threadLocal2*/){
+            this.threadLocal=threadLocal;
+            // this.threadLocal2=threadLocal2;
+
+        }
+
+        /**
+         * When an object implementing interface <code>Runnable</code> is used
+         * to create a thread, starting the thread causes the object's
+         * <code>run</code> method to be called in that separately executing
+         * thread.
+         * <p>
+         * The general contract of the method <code>run</code> is that it may
+         * take any action whatsoever.
+         *
+         * @see Thread#run()
+         */
+        @Override
+        public void run() {
+          //  setThreadLocal();
+            getThreadLocal();
+
+
+        }
+
+        private synchronized void getThreadLocal(){
+            System.out.println(Thread.currentThread().getName() + "get-threadlocal-" + threadLocal.get());
+
         }
     }
 }
