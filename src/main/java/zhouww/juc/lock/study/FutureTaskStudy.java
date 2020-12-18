@@ -2,27 +2,35 @@ package zhouww.juc.lock.study;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class FutureTaskStudy {
+public class FutureTaskStudy<T> {
     private static final int HASH_INCREMENT = 0x61c88647;
     private static final int INITIAL_CAPACITY = 16;
     private static test[] table;
     private static AtomicInteger nextHashCode =
             new AtomicInteger();
+    private  int keyM=nextHashCode();
+    private static FutureTaskStudy<String> kk=new FutureTaskStudy();
+    private static int nextHashCode() {
+        return nextHashCode.getAndAdd(HASH_INCREMENT);
+    }
+
     public static void main(String[] args) {
         FutureTaskStudy p=new FutureTaskStudy();
-        test i=new test();
-        p.set(i,"op");
-        p.get(i);
+
+        p.set("ooooo","op");
+        p.set("ooooo1","op");
+        p.set("ooooo1","op");
+       // p.get(i);
     }
     FutureTaskStudy(){
         table=new test[16];
     }
-    private  void set(test t,Object vale){
-        for(int j=0;j<=16;j++){
+    private  void set(T t,Object vale){
+        //for(int j=0;j<=16;j++){
           //  int i=t.threadLocalHashCode & (INITIAL_CAPACITY-1);
-
-            System.out.println("ru====="+((nextHashCode.getAndAdd(HASH_INCREMENT)) & (16-1)));
-        }
+            System.out.println("ru=====ttt--"+((this.keyM)));
+            System.out.println("ru====="+((this.keyM) & (16-1)));
+       // }
 
     }
     private  test get(test t){
