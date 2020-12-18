@@ -51,17 +51,49 @@ import java.util.concurrent.TimeUnit;
  *   如果已经存在 就调用  threadlocalMap的set进行数据更新 map.set(this,value);中的this是指当前threadlocal对象
  *
  *
+ *    接着我们继续看 createMap(Thread t, T firstValue)  方法 ，方法中将新创建的ThreadLocalMap 对象赋值值给了当前线程 threadlocals副本属性；
+ *    ThreadLocalMap 类是 threadLocal中的一个内部静态类 如果当前线程 的副本threadLocals对象为空是 系统就会为当前线程创建一个ThreadLocalMap对象
  *      void createMap(Thread t, T firstValue) {
- *         t.threadLocals = new ThreadLocalMap(this, firstValue);
+ *         t.threadLocals = new ThreadLocalMap(this, firstValue); // 这里的this 同样是是指当前对象 的threadLocal对象
  *     }
+ *     下面是ThreadLocalMap(this, firstValue)构造函数，在构造函数，在下面的构造函数中有一个 数组Entry的对象，那这个是什么呢？这个数组是ThreadLocalMap中的一个
+ *     静态类实体 并且是一个Threadlocal弱引用的类
  *
  *      ThreadLocalMap(ThreadLocal<?> firstKey, Object firstValue) {
- *             table = new Entry[INITIAL_CAPACITY];
- *             int i = firstKey.threadLocalHashCode & (INITIAL_CAPACITY - 1);
- *             table[i] = new Entry(firstKey, firstValue);
- *             size = 1;
- *             setThreshold(INITIAL_CAPACITY);
+ *             table = new Entry[INITIAL_CAPACITY]; // 创建一个Entry数组 用于存放值信息
+ *             int i = firstKey.threadLocalHashCode & (INITIAL_CAPACITY - 1);// 计算存储位置的的下标
+ *             table[i] = new Entry(firstKey, firstValue); // 创建一个Entry实体存放到 Entry数组中
+ *             size = 1;// 记录数组大小
+ *             setThreshold(INITIAL_CAPACITY);// 设置下次库容数组的加载因子
  *         }
+ *
+ *
+ *         到这里我们就将 ThreadLocal 是如何将信息设置到当前线程中的流程看完了。（说明：对于线程来说只有共享资源才存在线程，对于局部变量和方法的调用如果不存在共享资源都是线程安全的）
+ *         从上面的源码分析我们可以简单总结表达 下面我们来回答一下上面的问题吧：
+ *         什么是threadLocal? -实际就是用来给每个线程创建特定 副本的类（官方文档都建议 将该类声明为类静态变量使用）
+ *         在多线程中如何使用Threadlocal实现线程隔离的？--由于每个线程ThreadLocals 都是每个线程独有的，对其他线程是不可见的 所以他可以实现线程隔离
+ *         threadlocal 使用过程中是否会出现 内存泄露？--从使用场景来说时可能会出现内存泄露，一般在使用线程池时 如果创建了一个很大的类 如果创建的线程池在某种业务场景下是不允许停止 这个时候线程副本会
+ *         一直存在并且 弱引用的threadlocal 已经被gc回收 这个时候可能调用set，或get方法无法读取该内存信息，那么该部分对象就无法被gc进行回收，如果无法被回收的对象多了就会出现内存泄露的可能（一般普通的线程 是可以避免这种
+ *         问题的，因为线程执行完成 对应的副本也会跟着线程结束 被内存进行回收的-- 不存在了强引用）
+ *         那么如何避免Threadlocal的内存泄露呢？---为了避免出现这种内存泄露的风险 在业务中 应在合适的位置调用 threadLocal的remove（）方法进行操作
+ *
+ *
+ *
+ *         ThreadLocal特性
+ * ThreadLocal和Synchronized都是为了解决多线程中相同变量的访问冲突问题，不同的点是
+ *
+ * Synchronized是通过线程等待，牺牲时间来解决访问冲突
+ * ThreadLocal是通过每个线程单独一份存储空间，牺牲空间来解决冲突，并且相比于Synchronized，ThreadLocal具有线程隔离的效果，只有在线程内才能获取到对应的值，线程外则不能访问到想要的值。
+ * 正因为ThreadLocal的线程隔离特性，使他的应用场景相对来说更为特殊一些。在android中Looper、ActivityThread以及AMS中都用到了ThreadLocal。当某些数据是以线程为作用域并且不同线程具有不同的数据副本的时候，就可以考虑采用ThreadLocal
+ * 链接：https://www.jianshu.com/p/3c5d7f09dfbd
+ *
+ *  总结如下：
+ *
+ * 对于某一ThreadLocal来讲，他的索引值i是确定的，在不同线程之间访问时访问的是不同的table数组的同一位置即都为table[i]，只不过这个不同线程之间的table是独立的。
+ * 对于同一线程的不同ThreadLocal来讲，这些ThreadLocal实例共享一个table数组，然后每个ThreadLocal实例在table中的索引i是不同的
+ *
+ *
+ *
  *
  *
  *
