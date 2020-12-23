@@ -1,6 +1,10 @@
 package zhouww.juc.lock.study;
 
+import org.springframework.util.CollectionUtils;
+
 import java.util.concurrent.TimeUnit;
+
+import static java.lang.Thread.yield;
 
 /**
  *
@@ -67,7 +71,7 @@ public class ThreadStudy {
 
 
         // JoinRunnable
-        for(int i=0;i<10;i++){
+/*        for(int i=0;i<10;i++){
             if(i==4){
                 Long g=System.currentTimeMillis();
 
@@ -86,8 +90,21 @@ public class ThreadStudy {
             System.out.println("main-"+i);
 
 
-        }
-        Long g2=System.currentTimeMillis();
+        }*/
+        NotifyWaitUse notifyWaitUse=new NotifyWaitUse();
+        Thread thread=new Thread(notifyWaitUse);
+        thread.start();
+        Thread thread2=new Thread(new NotifyWaitUse());
+        thread2.setPriority(5);
+        thread2.start();
+        Thread thread3=new Thread(new NotifyWaitUse());
+        thread3.start();
+        Thread thread4=new Thread(new NotifyWaitUse());
+        thread4.setPriority(5);
+        thread4.start();
+        Thread thread5=new Thread(new NotifyWaitUse());
+        thread5.start();
+
 
 
 
@@ -176,7 +193,7 @@ public class ThreadStudy {
                 System.out.println(Thread.currentThread().getName()+"  开始运行  进入就绪状态锁不释放，其它线程等待获取锁");
 
                     long startTime=System.currentTimeMillis()/1000;
-                    Thread.yield();
+                    yield();
                     //Thread.sleep(1000);
                     long endTime= System.currentTimeMillis()/1000;
                     System.out.println(Thread.currentThread().getName()+"  运行结束 运行耗时:"+(endTime-startTime)+"秒 线程即将释放锁，其它线程可获取锁");
@@ -206,6 +223,53 @@ public class ThreadStudy {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+
+        }
+    }
+
+    public  static  class NotifyWaitUse implements Runnable{
+
+        /**
+         * When an object implementing interface <code>Runnable</code> is used
+         * to create a thread, starting the thread causes the object's
+         * <code>run</code> method to be called in that separately executing
+         * thread.
+         * <p>
+         * The general contract of the method <code>run</code> is that it may
+         * take any action whatsoever.
+         *
+         * @see Thread#run()
+         */
+        @Override
+        public void run() {
+            noty();
+
+        }
+
+        private     void noty(){
+            synchronized(this){
+                int i=0;
+                while (true){
+                    i++;
+                    System.out.println("noty()"+i+Thread.currentThread().getName());
+                    try {
+                        wait(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+
+
+
+                }
+            }
+
+
+        }
+        private synchronized void waity(){
+            System.out.println("waity()"+Thread.currentThread().getName());
+
+                notify();
 
         }
     }
