@@ -21,13 +21,13 @@ public class ReentrantLockClassThreadPool {
     static  final LinkedBlockingDeque<ThreadRunable> ls=new LinkedBlockingDeque<ThreadRunable>(); //  task-任务对象 实际要执行的业务对象实体（业务创建的Runable对象）
     static ReentrantLock lock=new ReentrantLock();
     public static void main(String[] args) {
-       // ExecutorService service= Executors.newFixedThreadPool(10);
+        ExecutorService service= Executors.newFixedThreadPool(10);
 
         // 创建线程池的任务 添加到队列中
         for(int i=0;i<100;i++) { // 多线程共享一个对象 在未使用同步锁时 易出现数据错误
             ThreadRunable tt=new ThreadRunable(lock);
             ls.add(tt);
-           //service.execute(tt);
+           service.execute(tt);
         }
         for(int k=0;k<30;k++){// 给线程池 创建线程 并且添加到 集合中
             ThreadRunable1 yy=new ThreadRunable1(null);
