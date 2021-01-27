@@ -1,28 +1,37 @@
 package zhouww.juc.lock.study;
-
+//
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class FutureTaskStudy<T> {
+/**
+ * threadLocal魔盒数研究学习
+ *  * 大萝卜:
+ *  * https://blog.csdn.net/wangzhangxing/article/details/84597125
+ *  *
+ *  * 大萝卜:
+ *  * https://www.javaspecialists.eu/archive/Issue164-Why-0x61c88647.html
+ * @param <T>
+ */
+public class MagicStudy<T> {
     private static final int HASH_INCREMENT = 0x61c88647;
     private static final int INITIAL_CAPACITY = 16;
     private static test[] table;
     private static AtomicInteger nextHashCode =
             new AtomicInteger();
     private  int keyM=nextHashCode();
-    private static FutureTaskStudy<String> kk=new FutureTaskStudy();
+    private static MagicStudy<String> kk=new MagicStudy();
     private static int nextHashCode() {
         return nextHashCode.getAndAdd(HASH_INCREMENT);
     }
 
     public static void main(String[] args) {
-        FutureTaskStudy p=new FutureTaskStudy();
+        MagicStudy p=new MagicStudy();
 
         p.set("ooooo","op");
         p.set("ooooo1","op");
         p.set("ooooo1","op");
        // p.get(i);
     }
-    FutureTaskStudy(){
+    MagicStudy(){
         table=new test[16];
     }
     private  void set(T t,Object vale){
