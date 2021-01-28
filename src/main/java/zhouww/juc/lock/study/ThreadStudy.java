@@ -54,7 +54,7 @@ import static java.lang.Thread.yield;
  */
 public class ThreadStudy {
     public static void main(String[] args) {
-       /* Thread t=new Thread(new myThread());
+        Thread t=new Thread(new myThread());
         t.start();
 
         Thread.currentThread().interrupt();
@@ -62,7 +62,7 @@ public class ThreadStudy {
         System.out.println(t.getName()+"2"+t.interrupted());
         Thread.currentThread().interrupt();
         System.out.println(t.getName()+"3"+t.isInterrupted());
-        System.out.println(t.getName()+"4"+t.isInterrupted());*/
+        System.out.println(t.getName()+"4"+t.isInterrupted());
        // sleep
         //runRunnable(new SleepThread(),"SleepRunnable");
 
@@ -91,7 +91,7 @@ public class ThreadStudy {
 
 
         }*/
-        NotifyWaitUse notifyWaitUse=new NotifyWaitUse();
+        /*NotifyWaitUse notifyWaitUse=new NotifyWaitUse();
         Thread thread=new Thread(notifyWaitUse);
         thread.start();
         Thread thread2=new Thread(new NotifyWaitUse());
@@ -103,7 +103,7 @@ public class ThreadStudy {
         thread4.setPriority(5);
         thread4.start();
         Thread thread5=new Thread(new NotifyWaitUse());
-        thread5.start();
+        thread5.start();*/
 
 
 
