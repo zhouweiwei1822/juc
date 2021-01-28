@@ -1,4 +1,18 @@
- 停用线程的方法：
+ # 锁的学习
+ ##  锁的类型
+ ### 同步锁：
+    Synchronized、ReentrantLock 
+ ### 读写锁 ：ReentrantReadWriteLock
+    读锁：ReentrantReadWriteLock.ReadLock
+    写锁：ReentrantReadWriteLock.WriteLock
+### 锁实现和继承实现类 AbstractQueuedSynchronizer
+    todo
+
+
+
+ 
+ 
+# 停用线程的方法：
  - 系统方式退出 直接调用System.exit(0) 直接退出系统 也就是调用虚拟机的停用让所用的线程全部停止
  - 程序正常执行退出
  - 程序执行异常退出
