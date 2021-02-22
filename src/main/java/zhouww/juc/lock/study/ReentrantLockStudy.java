@@ -22,13 +22,14 @@ public class  ReentrantLockStudy {
 
     public static void main(String[] args) {
         Thread t1=null;
-        for(int i=0;i<1;i++){
+        ReentranLockNoFir op=  new ReentranLockNoFir(lockNoFir);
+        for(int i=0;i<3;i++){
             // 公平锁的 案例
            /* Thread t=  new Thread(new ReentranLockFir(lockFir));
                   t.setName("firLock-"+i);
                   t.start();*/
                   // 非公平锁的案例
-             t1=  new Thread(new ReentranLockNoFir(lockNoFir));
+             t1=  new Thread(op);
             t1.setName("nofir-"+i);
             t1.start();
 
@@ -62,11 +63,16 @@ public class  ReentrantLockStudy {
         @Override
         public void run() {
 
-           // lockNoFir.lock();
-            System.out.println(Thread.currentThread().getName());
+            lockNoFir.lock();
+            while(true){
+                System.out.println(Thread.currentThread().getName());
+            }
+
+           // LockSupport.park(this);
+           /* System.out.println(Thread.currentThread().getName());
             LockSupport.park(this);
-            System.out.println(Thread.interrupted());
-           // lockNoFir.unlock();
+            System.out.println(Thread.interrupted());*/
+          //  lockNoFir.unlock();
         }
     }
    public static class ReentranLockFir implements Runnable{// 公平锁的实现
