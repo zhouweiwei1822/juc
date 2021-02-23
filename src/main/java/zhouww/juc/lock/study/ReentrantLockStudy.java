@@ -37,7 +37,7 @@ public class  ReentrantLockStudy {
         }
         try {
             TimeUnit.SECONDS.sleep(10);
-            System.out.println( t1.isAlive()+""+t1.getId());
+            System.out.println( t1.isAlive()+""+t1.getName());
             TimeUnit.SECONDS.sleep(10);
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -62,12 +62,12 @@ public class  ReentrantLockStudy {
          */
         @Override
         public void run() {
-
-            lockNoFir.lock();
+            LockSupport.park(this);
+        /*    lockNoFir.lock();
             while(true){
                 System.out.println(Thread.currentThread().getName());
-            }
-
+            }*/
+            System.out.println(Thread.currentThread().getName());
            // LockSupport.park(this);
            /* System.out.println(Thread.currentThread().getName());
             LockSupport.park(this);
