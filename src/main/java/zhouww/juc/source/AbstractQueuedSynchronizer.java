@@ -430,7 +430,7 @@ public abstract class AbstractQueuedSynchronizer
         return unsafe.compareAndSwapInt(this, stateOffset, expect, update);
     }
 
-    // Queuing utilities
+    // Queuing utilities  队列工具
 
     /**
      * The number of nanoseconds for which it is faster to spin
@@ -541,7 +541,7 @@ public abstract class AbstractQueuedSynchronizer
      */
     private void doReleaseShared() {
         /*
-         * Ensure that a release propagates, even if there are other
+             * Ensure that a release propagates, even if there are other
          * in-progress acquires/releases.  This proceeds in the usual
          * way of trying to unparkSuccessor of head if it needs
          * signal. But if it does not, status is set to PROPAGATE to
@@ -550,21 +550,24 @@ public abstract class AbstractQueuedSynchronizer
          * while we are doing this. Also, unlike other uses of
          * unparkSuccessor, we need to know if CAS to reset status
          * fails, if so rechecking.
+         * 确定 发布传播，尽管有其它的线程在获取或者释放 ,如果需要信号它通常尝试执行的方法是头结点唤醒的继承者
+         * 但是如果不是，状态被设置 PROPAGATE（-3）确信发布传播，传播则继续
+         * 此外，我们必须循环，以防止在执行此操作时添加新节点。另外也不能像其它使用了唤醒继承者方法那样，我们需要知道如果cas重置状态失败，那么就需要重新检查
          */
         for (;;) {
-            AbstractQueuedSynchronizer.Node h = head;
-            if (h != null && h != tail) {
-                int ws = h.waitStatus;
-                if (ws == AbstractQueuedSynchronizer.Node.SIGNAL) {
-                    if (!compareAndSetWaitStatus(h, AbstractQueuedSynchronizer.Node.SIGNAL, 0))
+            AbstractQueuedSynchronizer.Node h = head;// 获取头结点的信息
+            if (h != null && h != tail) {// 判断当前头结点是否为空或者等于尾结点 如果否
+                int ws = h.waitStatus; // 获取等待状态
+                if (ws == AbstractQueuedSynchronizer.Node.SIGNAL) {// 如果头节点为-1
+                    if (!compareAndSetWaitStatus(h, AbstractQueuedSynchronizer.Node.SIGNAL, 0))// 如果设置状态失败 继续进行设置，如果成功就唤醒下一个节点
                         continue;            // loop to recheck cases
-                    unparkSuccessor(h);
+                    unparkSuccessor(h);// 通过头结点唤醒另外一个节点线程
                 }
                 else if (ws == 0 &&
-                        !compareAndSetWaitStatus(h, 0, AbstractQueuedSynchronizer.Node.PROPAGATE))
+                        !compareAndSetWaitStatus(h, 0, AbstractQueuedSynchronizer.Node.PROPAGATE))/// 如果传播值设置失败继续执行
                     continue;                // loop on failed CAS
             }
-            if (h == head)                   // loop if head changed
+            if (h == head)                   // loop if head changed 如果h是头节点直接跳出循环
                 break;
         }
     }
@@ -573,12 +576,13 @@ public abstract class AbstractQueuedSynchronizer
      * Sets head of queue, and checks if successor may be waiting
      * in shared mode, if so propagating if either propagate > 0 or
      * PROPAGATE status was set.
+     * 设置队列的头节点，并且检查继承节点可能是处于分享模式下的等待，如果是传播，要么大于0要么设置为-3
      *
      * @param node the node
      * @param propagate the return value from a tryAcquireShared
      */
     private void setHeadAndPropagate(AbstractQueuedSynchronizer.Node node, int propagate) {
-        AbstractQueuedSynchronizer.Node h = head; // Record old head for check below
+        AbstractQueuedSynchronizer.Node h = head; // Record old head for check below  记录头结点用于下面检测
         setHead(node);
         /*
          * Try to signal next queued node if:
@@ -595,30 +599,33 @@ public abstract class AbstractQueuedSynchronizer
          * unnecessary wake-ups, but only when there are multiple
          * racing acquires/releases, so most need signals now or soon
          * anyway.
+         * 尝试给队列中的下一个节点发送信号，如果传播是被调用者指明或者通过记录（类似h.waitStatus 要么在设置setHead前要么在setHead后）之前的操作（提示：这是用的是单个等待状态检测，因为PROPAGATE（-3）状态可能被改变为SIGNAL（-1））
+         * 并且下一个节点处于 共享模式的等待状态或者我们根本不知道，因为他可能出现null。在两种的保守的检查中可能引起不必要的唤醒，仅当有多个竞争 acquires/releases时，因此大多数情况需要马上发送信号
          */
         if (propagate > 0 || h == null || h.waitStatus < 0 ||
                 (h = head) == null || h.waitStatus < 0) {
-            AbstractQueuedSynchronizer.Node s = node.next;
+            AbstractQueuedSynchronizer.Node s = node.next;// 获取下个节点信息
             if (s == null || s.isShared())
-                doReleaseShared();
+                doReleaseShared();// 共享释放
         }
     }
 
-    // Utilities for various versions of acquire
+    // Utilities for various versions of acquire 为各种版本获取提供的工具
 
     /**
      * Cancels an ongoing attempt to acquire.
+     * 对正在进行尝试获取的进行取消
      *
      * @param node the node
      */
     private void cancelAcquire(AbstractQueuedSynchronizer.Node node) {
-        // Ignore if node doesn't exist
+        // Ignore if node doesn't exist 忽略不存在的节点
         if (node == null)
             return;
 
-        node.thread = null;
+        node.thread = null;// 将节点的线程属性设置为空
 
-        // Skip cancelled predecessors
+        // Skip cancelled predecessors 跳过被取消的前驱
         AbstractQueuedSynchronizer.Node pred = node.prev;
         while (pred.waitStatus > 0)
             node.prev = pred = pred.prev;
@@ -626,19 +633,21 @@ public abstract class AbstractQueuedSynchronizer
         // predNext is the apparent node to unsplice. CASes below will
         // fail if not, in which case, we lost race vs another cancel
         // or signal, so no further action is necessary.
+        // predNext显然是要解拼接的节点。如果不这样，下面的情况将失败，在这种情况下，我们失掉了与另一个取消或信号的竞争，所以不需要进一步的操作。
         AbstractQueuedSynchronizer.Node predNext = pred.next;
 
         // Can use unconditional write instead of CAS here.
         // After this atomic step, other Nodes can skip past us.
         // Before, we are free of interference from other threads.
+        // 能使用无条件的写入代替CAS方式在这，这个之后是个原子操作步骤，其它节点可以跳过我们这个操作，以前我们这个操作不受其它线程干扰
         node.waitStatus = AbstractQueuedSynchronizer.Node.CANCELLED;
 
-        // If we are the tail, remove ourselves.
-        if (node == tail && compareAndSetTail(node, pred)) {
+        // If we are the tail, remove ourselves.如果是尾结点 ，自我删除
+        if (node == tail && compareAndSetTail(node, pred)) {// CAS操作
             compareAndSetNext(pred, predNext, null);
         } else {
-            // If successor needs signal, try to set pred's next-link
-            // so it will get one. Otherwise wake it up to propagate.
+            // If successor needs signal, try to set pred's next-link 如果继承者需要信号，尝试的去设置前驱next的连接
+            // so it will get one. Otherwise wake it up to propagate. 因此 它将接收到一个，否则将被唤醒和传播
             int ws;
             if (pred != head &&
                     ((ws = pred.waitStatus) == AbstractQueuedSynchronizer.Node.SIGNAL ||
@@ -659,23 +668,25 @@ public abstract class AbstractQueuedSynchronizer
      * Checks and updates status for a node that failed to acquire.
      * Returns true if thread should block. This is the main signal
      * control in all acquire loops.  Requires that pred == node.prev.
-     *
+     *为获取失败的节点检查和更新状态 。如果返回true 线程应该被阻塞，这是主要的信号在所有的控制循环中 必须是 pred == node.prev.
      * @param pred node's predecessor holding status
      * @param node the node
      * @return {@code true} if thread should block
      */
     private static boolean shouldParkAfterFailedAcquire(AbstractQueuedSynchronizer.Node pred, AbstractQueuedSynchronizer.Node node) {
-        int ws = pred.waitStatus;
+        int ws = pred.waitStatus;// 获取前驱等待状态
         if (ws == AbstractQueuedSynchronizer.Node.SIGNAL)
             /*
              * This node has already set status asking a release
              * to signal it, so it can safely park.
+             * 这个节点已经被设置要求释放的信号了，因此可以安全停用
              */
             return true;
-        if (ws > 0) {
+        if (ws > 0) {// 如果被撤销
             /*
              * Predecessor was cancelled. Skip over predecessors and
              * indicate retry.
+             * 如果前驱被撤销，跳过被取消的前驱并且重试 设置
              */
             do {
                 node.prev = pred = pred.prev;
@@ -686,6 +697,7 @@ public abstract class AbstractQueuedSynchronizer
              * waitStatus must be 0 or PROPAGATE.  Indicate that we
              * need a signal, but don't park yet.  Caller will need to
              * retry to make sure it cannot acquire before parking.
+             * 如果 等待状态为0或者-3 我们需要将值设置为 -1，但是仍然不能停用，调用者将重新调用该方法确认在停用前该节点是不能够获取的锁的
              */
             compareAndSetWaitStatus(pred, ws, AbstractQueuedSynchronizer.Node.SIGNAL);
         }
@@ -693,7 +705,7 @@ public abstract class AbstractQueuedSynchronizer
     }
 
     /**
-     * Convenience method to interrupt current thread.
+     * Convenience method to interrupt current thread. 提供方法去中断当前线程
      */
     static void selfInterrupt() {
         Thread.currentThread().interrupt();
@@ -701,12 +713,13 @@ public abstract class AbstractQueuedSynchronizer
 
     /**
      * Convenience method to park and then check if interrupted
+     *  提供 方法挂起当前线程并且检查是否已停用
      *
      * @return {@code true} if interrupted
      */
     private final boolean parkAndCheckInterrupt() {
-        LockSupport.park(this);
-        return Thread.interrupted();
+        LockSupport.park(this);// 挂起当前线程
+        return Thread.interrupted();// 检查当前线程是否已中断
     }
 
     /*
