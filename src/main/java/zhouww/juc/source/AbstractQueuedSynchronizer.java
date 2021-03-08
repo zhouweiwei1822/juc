@@ -729,40 +729,43 @@ public abstract class AbstractQueuedSynchronizer
      * interactions of exception mechanics (including ensuring that we
      * cancel if tryAcquire throws exception) and other control, at
      * least not without hurting performance too much.
+     * 各种获取，都是在独占和分享模式下控制的。每种获取方式都基本相同，但是有些小的因素不同可能是由于处理交互异常的的结构（包括确保在tryAcquire抛出异常时取消）和其它控制，这给使用者带来了一些烦恼
+     * 至少不会对性能造成太大影响。
      */
 
     /**
      * Acquires in exclusive uninterruptible mode for thread already in
      * queue. Used by condition wait methods as well as acquire.
-     *
+     * 使用独占非中断模式获取已存在的队列的线程， 用于条件等待方法和获取方法。
      * @param node the node
      * @param arg the acquire argument
      * @return {@code true} if interrupted while waiting
      */
     final boolean acquireQueued(final AbstractQueuedSynchronizer.Node node, int arg) {
-        boolean failed = true;
+        boolean failed = true;// 定义失败标记
         try {
-            boolean interrupted = false;
-            for (;;) {
-                final AbstractQueuedSynchronizer.Node p = node.predecessor();
-                if (p == head && tryAcquire(arg)) {
-                    setHead(node);
-                    p.next = null; // help GC
+            boolean interrupted = false;  // 定义中断标记
+            for (;;) { // 进行自旋操作（cas）
+                final AbstractQueuedSynchronizer.Node p = node.predecessor();// 获取前驱节点
+                if (p == head && tryAcquire(arg)) {// 判断前驱是否为头结点 并且试着获取锁
+                    setHead(node);// 将当前节点设置为头结点
+                    p.next = null; // help GC 将头结点引用去除
                     failed = false;
                     return interrupted;
                 }
                 if (shouldParkAfterFailedAcquire(p, node) &&
-                        parkAndCheckInterrupt())
+                        parkAndCheckInterrupt())// 如果node节点被设置 中断和阻塞 则返回true
                     interrupted = true;
             }
         } finally {
             if (failed)
-                cancelAcquire(node);
+                cancelAcquire(node);// 如果 获取失败就进行 取消获取
         }
     }
 
     /**
      * Acquires in exclusive interruptible mode.
+     * 以独占可中断模式获取。
      * @param arg the acquire argument
      */
     private void doAcquireInterruptibly(int arg)
