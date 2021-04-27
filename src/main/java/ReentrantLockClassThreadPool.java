@@ -33,6 +33,8 @@ public class ReentrantLockClassThreadPool {
             ThreadRunable1 yy=new ThreadRunable1(null);
             Thread ts = new Thread(yy);
             ts.setName("myThreadPool-Thread-"+k);
+
+
             ts.start();
            // workers.add(yy);
         }
