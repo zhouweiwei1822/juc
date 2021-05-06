@@ -27,7 +27,7 @@ public class ReentrantLockClassThreadPool {
         for(int i=0;i<100;i++) { // 多线程共享一个对象 在未使用同步锁时 易出现数据错误
             ThreadRunable tt=new ThreadRunable(lock);
             ls.add(tt);
-         //  service.execute(tt);
+           service.execute(tt);
         }
         for(int k=0;k<30;k++){// 给线程池 创建线程 并且添加到 集合中
             ThreadRunable1 yy=new ThreadRunable1(null);

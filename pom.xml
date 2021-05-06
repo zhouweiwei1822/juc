@@ -27,6 +27,17 @@
             <version>4.1.59.Final</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.apache.activemq/activemq-all -->
+        <!-- https://mvnrepository.com/artifact/org.openjdk.jol/jol-core -->
+        <dependency>
+            <groupId>org.openjdk.jol</groupId>
+            <artifactId>jol-core</artifactId>
+            <version>0.15</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.openjdk.jol/jol-cli -->
+        <dependency>
+            <groupId>org.openjdk.jol</groupId>
+            <artifactId>jol-cli</artifactId>
+        </dependency>
 
 
     </dependencies>
