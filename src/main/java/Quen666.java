@@ -112,7 +112,10 @@ Thread.sleep(30000);
            // new Thread(w).start();
 
 
-
+        ArrayBlockingQueue<Integer> j=new ArrayBlockingQueue<Integer>(5);
+        j.add(1);
+        j.take();
+        j.put(1);
 
 
     }
