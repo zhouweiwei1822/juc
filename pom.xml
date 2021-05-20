@@ -37,6 +37,7 @@
         <dependency>
             <groupId>org.openjdk.jol</groupId>
             <artifactId>jol-cli</artifactId>
+            <version>0.15</version>
         </dependency>
 
 

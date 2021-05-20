@@ -1,22 +1,30 @@
 package zhouww.juc.que.study;
 
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 public class ArrayBlockingQueueStudy {
   static final ArrayBlockingQueue<String> strings = new ArrayBlockingQueue<String>(4);
     static  final ExecutorService service = Executors.newFixedThreadPool(5);
+    static  final  LinkedBlockingQueue<Integer> f=new LinkedBlockingQueue<>(3);
 
     public static void main(String[] args) throws InterruptedException {
       final   getIm getIm = new getIm();
         //getIm.run();
-        strings.add("rr"); //
+     /*   strings.add("rr"); //
         strings.add("rr2"); //
         strings.add("rr3"); //
         System.out.println(strings.peek()); //
         System.out.println(strings.peek()); //
-        System.out.println(strings.peek()); //
+        System.out.println(strings.peek()); //*/
+      //  LinkedBlockingQueue<Integer> f=new LinkedBlockingQueue<>(3);
+        long l = System.currentTimeMillis();
+        System.out.println("即将进入阻塞 10s "+l);
+        f.poll(10,TimeUnit.SECONDS);
+        System.out.println("阻塞结束耗时 "+(System.currentTimeMillis()-l));
+       new Thread(new setIm()).start();
+        new Thread(new getIm()).start();
+
+
         //  service.shutdown();
        //for (int i = 0; i < 10; i++) {
 
@@ -45,11 +53,22 @@ public class ArrayBlockingQueueStudy {
        */
       @Override
       public void run() {
+
           try {
-              ArrayBlockingQueueStudy.getOBj(strings);
+              Thread.sleep(1000);
+              System.out.println(f.take());
+              Thread.sleep(1000);
+              System.out.println(f.take());
+              Thread.sleep(1000);
+              System.out.println(f.take());
           } catch (InterruptedException e) {
               e.printStackTrace();
           }
+          /*try {
+              ArrayBlockingQueueStudy.getOBj(strings);
+          } catch (InterruptedException e) {
+              e.printStackTrace();
+          }*/
       }
   }
  static class setIm implements Runnable{
@@ -67,11 +86,26 @@ public class ArrayBlockingQueueStudy {
       */
      @Override
      public void run() {
+
          try {
-             ArrayBlockingQueueStudy.setOBj(strings);
+             f.put(1);
+             System.out.println("put==="+1);
+             f.put(1);
+             System.out.println("put==="+2);
+             f.put(1);
+             System.out.println("put==="+3);
+             f.put(1);
+             System.out.println("put==="+4);
+             f.put(1);
+             System.out.println("put==="+5);
          } catch (InterruptedException e) {
              e.printStackTrace();
          }
+        /* try {
+             ArrayBlockingQueueStudy.setOBj(strings);
+         } catch (InterruptedException e) {
+             e.printStackTrace();
+         }*/
      }
  }
     public  static void getOBj(ArrayBlockingQueue<String> strings) throws InterruptedException {

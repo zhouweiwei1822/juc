@@ -1,6 +1,7 @@
 import java.util.HashSet;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * 简单的 线程池的实现 和 ReentranLock 的简单实用
@@ -20,6 +21,7 @@ public class ReentrantLockClassThreadPool {
     static  final HashSet<ThreadRunable1> workers = new HashSet<ThreadRunable1>();// worker-任务执行对象集合 （线程池创建Runable对象）
     static  final LinkedBlockingDeque<ThreadRunable> ls=new LinkedBlockingDeque<ThreadRunable>(); //  task-任务对象 实际要执行的业务对象实体（业务创建的Runable对象）
     static ReentrantLock lock=new ReentrantLock();
+    static ReentrantReadWriteLock lock2=new ReentrantReadWriteLock();
     public static void main(String[] args) {
         ExecutorService service= Executors.newFixedThreadPool(10);
 
