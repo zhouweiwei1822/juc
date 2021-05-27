@@ -13,7 +13,7 @@ public class MultiThreadClient {
     static CyclicBarrier cyclicBarrier=new CyclicBarrier(50);
 
     public static void main(String[] args) {
-        ThreadPoolExecutor acceptWor=new ThreadPoolExecutor(100,200,60, TimeUnit.MICROSECONDS,new LinkedBlockingQueue<>(1000));
+        ThreadPoolExecutor acceptWor=new ThreadPoolExecutor(100,200,60, TimeUnit.MICROSECONDS,new LinkedBlockingQueue<Runnable>(1000));
         for (int i = 0; i < 1000; i++) {
             acceptWor.execute(new Taskwor());
 
@@ -43,6 +43,7 @@ public class MultiThreadClient {
 
         }
         private void task() throws IOException, BrokenBarrierException, InterruptedException {
+
             // 创建一个 socket 实例
             Socket socket=new Socket();
             cyclicBarrier.await();
