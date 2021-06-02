@@ -21,7 +21,7 @@ while (true){
          n.clear();
          socketChannel.read(n);
          n.flip();
-         System.out.println("数据来了"+new String(n.array(),0,n.remaining()));
+         System.out.println("数据来了"+StandardCharsets.UTF_8.decode(n));
          n.clear();
      }
 

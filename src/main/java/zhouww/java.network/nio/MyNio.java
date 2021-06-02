@@ -61,7 +61,9 @@ public class MyNio {
                     Iterator<SelectionKey> keyIterator=selectionKeys.iterator();
                     while (keyIterator.hasNext()){
                         SelectionKey key=keyIterator.next();
+                        keyIterator.remove();
                         dispatch( key);
+
 
                     }
                 } catch (IOException e) {
@@ -151,7 +153,7 @@ public class MyNio {
             if(state==read){
                 read();
                 state=send;
-            }
+            }else
             if(state==send){
                 send();
                 state=read;
@@ -162,7 +164,7 @@ public class MyNio {
            SocketChannel socketChannel= (SocketChannel)selectionKey.channel();
             try {
                 socketChannel.read(input);
-                input.flip();// 转换为读模式
+               // input.flip();// 转换为读模式
                 while(input.hasRemaining()){// 判断是否还存在 未读完的信息
                     System.out.println("接收的数据"+StandardCharsets.UTF_8.decode(input));
                 }
@@ -177,7 +179,8 @@ public class MyNio {
             output.clear();
             try {
                 //
-                output.put("收到数据".getBytes());
+
+                output=  StandardCharsets.UTF_8.encode("收到数据");
                 socketChannel.write(output);
                 selectionKey.interestOps(SelectionKey.OP_READ);
             } catch (IOException e) {
