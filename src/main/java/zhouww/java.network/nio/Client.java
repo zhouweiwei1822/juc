@@ -10,7 +10,7 @@ import java.util.Scanner;
 public class Client {
     public static void main(String[] args) throws IOException {
         SocketChannel socketChannel=SocketChannel.open();
-        socketChannel.connect(new InetSocketAddress("localhost",8090));
+        socketChannel.connect(new InetSocketAddress("localhost",8091));
         ByteBuffer n=ByteBuffer.allocate(1024);
 while (true){
      if(socketChannel!=null){

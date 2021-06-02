@@ -104,7 +104,6 @@ public class MyNio {
         @Override
         public void run() {
             try {
-                System.out.println(Thread.currentThread().getName()+"即将接收客户端的请求");
                 // 接收客户端请求
                 SocketChannel socketChannel=serverSocketChannel.accept();
                 if(socketChannel!=null){
