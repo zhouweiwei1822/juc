@@ -13,7 +13,7 @@ import java.nio.channels.SocketChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 
-public class SimpleNioServer {
+public class SimpleByteBuffNioServer {
     public static void main(String[] args) throws IOException {
         NioServer nioServer = new NioServer();
         nioServer.server();
